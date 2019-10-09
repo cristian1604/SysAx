@@ -1,23 +1,21 @@
 # SysAx
 AXIA database ToolKit
 
-![Generic badge](https://img.shields.io/github/pipenv/locked/python-version/cristian1604/SysAx) ![Generic badge](https://img.shields.io/badge/made%20with-Python-blue.svg) ![Generic badge](https://img.shields.io/badge/status-TEST-red.svg)
+![Generic badge](https://img.shields.io/badge/made%20with-Python-blue.svg) ![Generic badge](https://img.shields.io/badge/status-TEST-red.svg)
 
-This is a *wrapper-script* to perform a database backup and restoring functions using **Postgres** dump utilities.
+This is a *wrapper-script* to perform a database backup and restoring functions using **Postgres** dump utilities, even between different servers. The only restriction is: __all the servers must have the same postgres version.__
 
 (If you want a script to perform several databases from a DB engine at the same time, take a look [backupDatabase])
 
-**This project currently runs on Linux.**
+**This project runs on Linux.**
 
 
 ### Requirements
 
 - Python version >= 3
-- The provided Postgres binaries correspond to the Pg 11.2
-- Notice: If you run this script on the database server, I recommend strongly use the provided binaries by the database engine.
+- [postgresql-client]. (required postgres binaries to use this script)
 
-
-### How to set parameters
+### Setting databases
 
 First of all, rename `settings.dat.dist` to `settings.dat`
 
@@ -30,15 +28,13 @@ On `settings.dat` you can add a list of parameters:
     username = USERNAME
     password = USER_PASSWD             
 
+### Run the script!
 
-### To Do:
-
-This is the first commit. It's not functional yet.
-
+Execute it with a simple command: `./main.py` and follow the menu
 
 ### Why this script?
 
-I was motivated by the need to perform a fast backup of several production databases on Postgres and replay it on a develop server.
+I was motivated by the need to perform a fast backup of several production databases running on Postgres, and replay it on a develop server in a few steps.
 
 
 About
@@ -49,3 +45,4 @@ Written by Cristian Bottazzi
 
 [//]: #
    [backupDatabase]: <https://github.com/cristian1604/backupDatabase>
+   [postgresql-client]: <https://www.postgresql.org/download/linux/ubuntu/>
