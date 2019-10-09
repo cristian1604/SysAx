@@ -1,5 +1,6 @@
 # SysAx
 AXIA database ToolKit
+
 ![Generic badge](https://img.shields.io/github/pipenv/locked/python-version/cristian1604/SysAx) ![Generic badge](https://img.shields.io/badge/made%20with-Python-blue.svg) ![Generic badge](https://img.shields.io/badge/status-TEST-red.svg)
 
 This is a *wrapper-script* to perform a database backup and restoring functions using **Postgres** dump utilities.
@@ -7,13 +8,6 @@ This is a *wrapper-script* to perform a database backup and restoring functions 
 (If you want a script to perform several databases from a DB engine at the same time, take a look [backupDatabase])
 
 **This project currently runs on Linux.**
-
-
-### Changelog
-
-  - Improve documentation
-  - Tested on multiple MySQL and Postgres databases (one script to call each DB engine)
-  - Comment code
 
 
 ### Requirements
@@ -25,11 +19,11 @@ This is a *wrapper-script* to perform a database backup and restoring functions 
 
 ### How to set parameters
 
-Parameters:
+First of all, rename `settings.dat.dist` to `settings.dat`
 
 On `settings.dat` you can add a list of parameters:
 
-    [ALIAS]                            # Alias for the connection
+    [ALIAS]                            # Alias to be used on the script
     database = DATABASE                # Database name
     host = HOST_IP                     # URL or IP to the database server
     port = HOST_PORT                   # Default: 5432
