@@ -4,11 +4,12 @@
 
 # Written by Cristian Bottazzi
 # 07/10/2019
-# Description: A little sysadmin tool to work with PostgreSQL
+# Description: A little sysadmin database tool to work with PostgreSQL
 #
 
 import os.path
 import configparser
+from func import checkSettingsFile
 
 class color:
    PURPLE = '\033[95m'
@@ -28,14 +29,17 @@ print("  ===========================================")
 print("  |                                         |")
 print("  |    SysAx => AXIA SysAdmin ToolKit       |")
 print("  |   PostgreSQL Database Administration    |")
-print("  |      Written by Cristian Bottazzi       |")
 print("  |                                         |")
 print("  ===========================================")
 print(color.END)
 print()
 
 config = configparser.ConfigParser()
-config.read('settings.dat')
+if checkSettingsFile():
+	config.read('settings.dat')
+else:
+	print(color.RED + "Settings file not configured. Rename it to settings.dat" + color.END)
+	quit()
 
 def backupDatabase():
 	print(color.CYAN)
@@ -45,7 +49,7 @@ def backupDatabase():
 	selection = input('Database selected: ')
 	if selection in config.sections():
 		print(color.GREEN + "executing...")
-		cmd = './bin/pg_dump --dbname=postgresql://'+ config[selection]['username'] +':'+ config[selection]['password'] +'@'+ config[selection]['host'] +':'+config[selection]['port']+'/'+ config[selection]['database'] +' > '+selection+'.sql'
+		cmd = 'pg_dump --dbname=postgresql://'+ config[selection]['username'] +':'+ config[selection]['password'] +'@'+ config[selection]['host'] +':'+config[selection]['port']+'/'+ config[selection]['database'] +' -F t > '+selection+'.tar'
 		os.system(cmd)
 		print("end.\n" + color.END)
 	else:
@@ -65,17 +69,30 @@ def exportTable():
 		return
 	table = input('TABLE: ')
 	print(color.GREEN + "executing...")
-	#cmd = "./bin/pg_dump --host " + config[source]['host'] + "-p" + config[source]['port'] + " --encoding=utf8 --no-owner --username="+ config[source]['username'] +" --password" + config[source]['password'] + " -t " + table + " " + config[source]['database'] + " > tmp.sql"
-	cmd = './bin/pg_dump --dbname=postgresql://'+ config[source]['username'] +':'+ config[source]['password'] +'@'+ config[source]['host'] +':'+config[source]['port']+'/'+ config[source]['database'] + " -t " + table +' > '+table+'.sql'
+	cmd = 'pg_dump --dbname=postgresql://'+ config[source]['username'] +':'+ config[source]['password'] +'@'+ config[source]['host'] +':'+config[source]['port']+'/'+ config[source]['database'] + " -t " + table +' > '+table+'.sql'
 	os.system(cmd)
-	#cmd = "./bin/psql --host " + config[destination]['host'] + " -p " + config[destination]['port'] + " --username=" + config[destination]['username'] + " " + config[destination]['database'] + " -f "+ table +".sql"
-	cmd = './bin/pg_dump --dbname=postgresql://'+ config[destination]['username'] +':'+ config[destination]['password'] +'@'+ config[destination]['host'] +':'+config[destination]['port']+'/'+ config[destination]['database'] +' < '+table+'.sql'
-	cmd = "./bin/pg_restore -d "+ config[destination]['database'] + " " + table +".sql -c -U db_user"
-	print(cmd)
-	#os.system(cmd)
+	cmd = 'psql --dbname=postgresql://'+ config[destination]['username'] +':'+ config[destination]['password'] +'@'+ config[destination]['host'] +':'+config[destination]['port']+'/'+ config[destination]['database'] +' < '+table+'.sql'
+	os.system(cmd)
+	print(color.END)
 
-#def dumpAllDatabases():
-	#ssh user@remote_machine "pg_dump -U dbuser -h localhost -C --column-inserts" >> backup_file_on_your_local_machine.sql
+def dumpAllDatabases():
+	print(color.CYAN)
+	print("Avaiable configs:")
+	print(config.sections())
+	source = input('DATABASE TO BACKUP: ')
+	if source not in config.sections():
+		print(color.RED + "The database configuration doesn't exist on settings file\n\n" + color.END)
+		return
+	destination = input('Save as: ')
+	if not source:
+		print(color.RED + "You have not provided a file name. Save as "+ source +"_DUMP.tar\n\n" + color.END)
+		destination = source + "_DUMP"
+		return
+
+	print(color.GREEN + "executing...")
+	cmd = "pg_dumpall --dbname=postgresql://"+ config[source]['username'] +':'+ config[source]['password'] +'@'+ config[source]['host'] +':'+config[source]['port'] + " > " + destination + ".sql"
+	os.system(cmd)
+	print("end." + color.END)
 
 def restoreDatabase():
 	print(color.CYAN)
@@ -94,16 +111,17 @@ def restoreDatabase():
 	confirm = input('Are you sure?: ')
 	if confirm != "yes, sure":
 		return
-	#cmd = "./bin/pg_restore -d "+ config[destination]['database'] + " " + source +" -U " + config[destination]['username']
-	cmd = "./bin/pg_restore -h " + config[destination]['host'] + " -p " + config[destination]['port'] + " -d " + config[destination]['database'] + " -U " + config[destination]['username'] + " " + source
+	print(color.GREEN + "executing...")
+	cmd = "pg_restore --dbname=postgresql://"+ config[destination]['username'] +':'+ config[destination]['password'] +'@'+ config[destination]['host'] +':'+config[destination]['port']+'/'+ config[destination]['database'] + " -c -1 < " + source
 	os.system(cmd)
+	print("end." + color.END)
 
 menu = {}
 menu['1']= color.GREEN + "Copy table" + color.END + " from " + color.RED + "prod" + color.END + " database to " + color.BLUE + "develop" + color.END + " database" 
-menu['2']= color.GREEN + "Backup" + color.END + " database"
-menu['3']= color.GREEN + "Restore " + color.END + "database from backup"
+menu['2']= color.GREEN + "Backup" + color.END + " database (to TAR file)"
+menu['3']= color.GREEN + "Restore " + color.END + "database from backup (from TAR file)"
 menu['4']= color.GREEN + "Backup ALL " + color.END + "databases from server"
-menu['5']= color.YELLOW + "Exit" + color.END
+menu['q']= color.YELLOW + "Exit" + color.END
 
 while True:
 	options=menu.keys()
@@ -121,9 +139,8 @@ while True:
 	elif selection == '3':
 		restoreDatabase()
 	elif selection == '4':
-		#dumpAllDatabases()
-		print("a")
-	elif selection == '5':
+		dumpAllDatabases()
+	elif selection == 'q':
 		break
 	else: 
 		print("Unknown Option Selected!")
