@@ -3,7 +3,8 @@ AXIA database ToolKit
 
 ![Generic badge](https://img.shields.io/badge/made%20with-Python-blue.svg) ![Generic badge](https://img.shields.io/badge/status-TEST-red.svg)
 
-This is a *wrapper-script* to perform a database backup and restoring functions using **Postgres** dump utilities, even between different servers. The only restriction is: __all the servers must have the same postgres version.__
+This is a *wrapper-script* to perform a database backup and restoring functions using **Postgres** dump utilities, even between different servers.
+Perform a fast database backup or restoration in a few steps. The only restriction is: __all the servers must have the same postgres version.__
 
 (If you want a script to perform several databases from a DB engine at the same time, take a look [backupDatabase])
 
